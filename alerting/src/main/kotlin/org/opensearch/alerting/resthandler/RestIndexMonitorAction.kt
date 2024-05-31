@@ -42,6 +42,7 @@ import org.opensearch.rest.RestResponse
 import org.opensearch.rest.action.RestResponseListener
 import java.io.IOException
 import java.time.Instant
+import java.util.Locale
 
 private val log = LogManager.getLogger(RestIndexMonitorAction::class.java)
 
@@ -100,8 +101,7 @@ class RestIndexMonitorAction : BaseRestHandler() {
 
             val monitorType = monitor.monitorType
             val triggers = monitor.triggers
-
-            when (monitorType) {
+            when (Monitor.MonitorType.valueOf(monitorType.uppercase(Locale.ROOT))) {
                 Monitor.MonitorType.QUERY_LEVEL_MONITOR -> {
                     triggers.forEach {
                         if (it !is QueryLevelTrigger) {

@@ -41,6 +41,7 @@ import org.opensearch.core.xcontent.NamedXContentRegistry
 import org.opensearch.tasks.Task
 import org.opensearch.transport.TransportService
 import java.time.Instant
+import java.util.Locale
 
 private val log = LogManager.getLogger(TransportExecuteMonitorAction::class.java)
 private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
@@ -83,7 +84,7 @@ class TransportExecuteMonitorAction @Inject constructor(
                     }
                     try {
                         log.info(
-                            "Executing monitor from API - id: ${monitor.id}, type: ${monitor.monitorType.name}, " +
+                            "Executing monitor from API - id: ${monitor.id}, type: ${monitor.monitorType}, " +
                                 "periodStart: $periodStart, periodEnd: $periodEnd, dryrun: ${execMonitorRequest.dryrun}"
                         )
                         val monitorRunResult = runner.runJob(monitor, periodStart, periodEnd, execMonitorRequest.dryrun, transportService)
@@ -137,7 +138,7 @@ class TransportExecuteMonitorAction @Inject constructor(
                     false -> (execMonitorRequest.monitor as Monitor).copy(user = user)
                 }
 
-                if (monitor.monitorType == Monitor.MonitorType.DOC_LEVEL_MONITOR) {
+                if (Monitor.MonitorType.valueOf(monitor.monitorType.uppercase(Locale.ROOT)) == Monitor.MonitorType.DOC_LEVEL_MONITOR) {
                     try {
                         scope.launch {
                             if (!docLevelMonitorQueries.docLevelQueryIndexExists(monitor.dataSources)) {
